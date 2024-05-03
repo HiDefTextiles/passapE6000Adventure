@@ -123,3 +123,12 @@ Arduino unoinn kemur í stað stýringarinar 'consolsins' og notast þeir við s
 ### Irene
 ![IreneDiagram](./img/IreneDiagram.png)
 Irene byggir á Bamberg en í stað þess að vera með tölvu usb tengda í arduino uno þá er raspberry pi með notendaviðmót sem stýrir
+
+Lesa kóðan þeirra og skilja hvernig þau eru að lesa inn staðsetningu með pinum frá ljósunum. Þetta virðist ekki flókið en erfitt að ná hausnum almennilega utanum þetta án  þess að fikta sjálfur.
+![Mynd af seglum frá itene](https://cdn.hackaday.io/images/5890161549120496890.png)
+<a href="https://hackaday.io/project/163701-passap-e6000-rebuilt-and-replaced-console/details" style="text-align:center;">Sjá meira hjá Irene</a>
+Light sensorinn skýnir ljósi í 2mm göt á guiderail, 3mm á milli gata, 5mm er ein nál.
+
+út frá munstri er hægt að lesa staðsetningu og átt lásins.
+
+Ég bætti við Repoinu hennar Irene og bamber hér í möppu, til að auðvelda mér að fina efnið og rýna í það.
