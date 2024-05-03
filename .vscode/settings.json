@@ -1,0 +1,9 @@
+{
+	"editor.defaultFormatter": "vscode.typescript-language-features",
+	"editor.tabSize": 4,
+	"editor.formatOnSave": true,
+	"editor.formatOnPaste": true,
+	"editor.codeActionsOnSave": {
+	  "source.fixAll.eslint": "explicit"
+	}	
+}
