@@ -42,6 +42,16 @@ GPIO.setmode(GPIO.BOARD)
 GPIO.setup(right_GPIO, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(left_GPIO, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(directionchange_GPIO, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+# Útskýring fyrir pull down og pull up
+# An input gpio will float between 0 and 1 if it's not connected to a voltage.
+
+# The pull-up/downs supply that voltage so that the gpio will have a defined value UNTIL overridden by a stronger force.
+
+# You should set a pull-down (to 0) when you expect the stronger force to pull it up to 1.
+
+# You should set a pull-up (to 1) when you expect the stronger force to pull it down to 0.
+
+# Otherwise the gpio will not change state and you'll never know about the external event.
 
 # -----------------------------------------------------------------------------
 # Variables
@@ -85,7 +95,7 @@ tech_Array = []
 
 
 # position
-needlePos_VNB = 1
+# needlePos_VNB = 1
 needlePos_HNB = 1
 
 # left end knitting, right end knitting
@@ -206,7 +216,7 @@ speed = 0
 # endStopp
 endStopp = 0
 
-# col hat two state: 0 = no colour change, 1 = colour change
+# col haS two state: 0 = no colour change, 1 = colour change
 col = 0
 
 change_drive_left = ""
@@ -289,7 +299,7 @@ def pattern_Array(listMy,data):
 
     
 
-    while m < 22:
+    while m < 22: # Notar while eins og for in og svo notar hún for in
 
         for y in range(0, 8):
 
@@ -305,7 +315,7 @@ def pattern_Array(listMy,data):
 
     return pattern
 
-    nameTech = str(number)+".txt"
+    nameTech = str(number)+".txt" # DAUÐUR KÓÐI???
 
     print("nameTech: " + nameTech)
 
@@ -327,7 +337,7 @@ def get_pattern(data):
     
     filename = Image.open(data)
 
-    global heightMy
+    global heightMy # GloBAL WTF?
 
     widthMy = filename.size[0]
     heightMy = filename.size[1]
@@ -413,6 +423,7 @@ def get_pattern(data):
             redMy, greenMy, blueMy = filename.getpixel(
                 pixel)
             
+            # ----- Býr til línu fyrir hvern lit
             if redMy == 0 and greenMy == 0 and blueMy == 0:
                 row_black.append(0)
             else:
@@ -437,14 +448,21 @@ def get_pattern(data):
                 row_red.append(0)
             else:
                 row_red.append(1)
+            # ------ Býr til línur ef annar hvor litana er? AFH wtf
 
-                
             # black, white
             if (redMy == 0 and greenMy == 0 and blueMy == 0) or (redMy == 255 and greenMy == 255 and blueMy == 255):
                 row_black_white.append(0)
             else:
                 row_black_white.append(1)
-
+            # Þetta er það sama
+            if (row_white[y] == 1) or (row_black[y]):
+                row_black_white.append(0)
+            else:
+                row_black_white.append(1)
+            # í raun er þetta líka það sama því bæði geta ekki verið gilt á sama tíma
+            row_black_white.append(row_black[y]+row_white[y]) 
+            # Þetta er smá bull
             # black, green
             if (redMy == 0 and greenMy == 0 and blueMy == 0) or (redMy < 20 and greenMy > 200 and blueMy < 20):
                 row_black_green.append(0)
@@ -763,12 +781,14 @@ def get_pattern(data):
 # values can therefore only be read out with name [1] [0]
 # get needle position from arduino front lock, rear lock
 
-
+# Hún skilur ekki functions Býr til eh global variables bull
+# Sem dæmi kallar hún alltaf á þetta fall til að uppfæra stöðu global variables sem er óþarfi
 def get_needlePos_VNB():
-    global needlePos_VNB
+    # global needlePos_VNB # Eyðum þessu
     connectionVNB.send("getNPos")       
     received_VNB = connectionVNB.receive()
-    needlePos_VNB = received_VNB[1][0]
+    return received_VNB[1][0] #Skilum gildinu beint og lögum allar útfærslur
+    # needlePos_VNB = received_VNB[1][0] # Eyðum þessu
     #print(needlePos_VNB)
  
 
@@ -810,7 +830,7 @@ def col_speed():
     speed = 1
     connectionMotor.send("slowDownSpeed", speed)   
     received_Motor_Speed=connectionMotor.receive()
-    slow_speed = received_Motor_Speed[1][0]
+    slow_speed = received_Motor_Speed[1][0] # UNUSED VARIABLE
     #print("rec_colour speed: ", slow_speed)
     
 def poti_speed():
@@ -1316,7 +1336,7 @@ def formArray():
 # According to needlePos_VNB and formArray send new motorState to Arduino_Motor
 def inputChange_right(right_GPIO):
 
-    get_needlePos_VNB()
+    needlePos_VNB = get_needlePos_VNB()
          
     global directionChanged
     global flag_left
@@ -1344,7 +1364,7 @@ def inputChange_right(right_GPIO):
 
 def inputChange_left(left_GPIO):
 
-    get_needlePos_VNB()
+    needlePos_VNB = get_needlePos_VNB()
     get_cursorPos()
 
     global directionChanged
@@ -1370,7 +1390,7 @@ def inputChange_left(left_GPIO):
 
 def inputChange_directionChange(directionchange_GPIO):
     
-    get_needlePos_VNB()
+    needlePos_VNB = get_needlePos_VNB()
 
     global directionChanged
     global flag_left
@@ -1393,7 +1413,7 @@ def inputChange_directionChange(directionchange_GPIO):
 
     
 
-# interrupt, bouncetime 1 ms
+# interrupt, bouncetime 200 ms
 GPIO.add_event_detect(right_GPIO, GPIO.RISING, callback=inputChange_right, bouncetime=200)
 GPIO.add_event_detect(left_GPIO, GPIO.RISING, callback=inputChange_left, bouncetime=200)
 GPIO.add_event_detect(directionchange_GPIO, GPIO.RISING, callback=inputChange_directionChange, bouncetime=500)
@@ -2018,6 +2038,7 @@ def send_none():
 
 
 # Dictionary functions VNB
+# Irene skilur ekki input og output eða variables sýnist mér
 
 def sendRow_colour_black():
     #print ('sending black')
@@ -2362,8 +2383,8 @@ def set_dirChange_to_0():
     global directionChanged
     directionChanged = 0
     print("directionChanged: ", directionChanged)
-    get_needlePos_VNB()
-    get_needlePos_HNB()
+    get_needlePos_VNB() # ER ÞETTA AÐ GERA EITTHVAÐ? NEI? 
+    get_needlePos_HNB() # SÆKIR ALLTAF STÖPUNA ÁPUR EN Þ'U GERIR NOKKURN SKAPAÐAN HLUT
     
 
 def setLeftEnd_VNB(data):
