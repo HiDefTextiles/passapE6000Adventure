@@ -902,9 +902,9 @@ def techArray():
     #print("flag_right ", flag_right)
     #print("flag_left ", flag_left)
 
-    if countTech >= len(tech_Array):
+    if countTech >= len(tech_Array): # Línur í tech array fylki
         countTech = 0
-  
+        
     x = tech_Array[countTech][0]
     x = int(x)
     rowCount_VNB = int(rowCount_VNB) + x

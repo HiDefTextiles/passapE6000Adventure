@@ -67,6 +67,13 @@ GPIO.setup(directionchange_GPIO, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 # Ég mun setja in variables hérna eftir þörf en ég dreg þær allar stranglega í efa
 
+countTech = 0
+tech_Array = []
+# count knitted row
+rowCount = 0
+# count knitted row VNB, HNB
+rowCount_VNB = 0
+rowCount_HNB = 0
 
 #--------------------------------------------------------------------------
 # Communication Arduino - Raspi
@@ -110,7 +117,6 @@ connectionHNB = PyCmdMessenger.CmdMessenger(b, [["sPat", "b*"],["sbPat", "b*"],
                                              ["setLeEnd", "i"], ["sbLeEnd", "l"],
                                              ["setRiEnd", "i"], ["sbRiEnd", "l"],
                                              ])    
-
 def pattern_Array(listMy):
 	patternArray = np.zeros(listMy.shape[0],23)
 	for x in range(0,listMy.shape[0]):
@@ -140,14 +146,13 @@ def get_pattern(data):
 	for x in range(0, heightMy):
 		for y in range(0, widthMy):
 			pixel = (y, x)
-
 			redMy, greenMy, blueMy = filename.getpixel(pixel)
 			black[x,y] = int(redMy == 0 and greenMy == 0 and blueMy == 0)
 			white[x,y] = int(redMy == 255 and greenMy == 255 and blueMy == 255)
 			green[x,y] = int(redMy < 20 and greenMy > 200 and blueMy < 20)
 			blue[x,y] = int(redMy < 20 and greenMy < 20 and blueMy > 200)
 			red[x,y] = int(redMy > 200 and greenMy < 20 and blueMy < 20)
-	return ( pattern_Array(black), 
+	return ( pattern_Array(black),  # Trúi ekki að þetta sé nauðsyn
 		 pattern_Array(white), 
 		 pattern_Array(green), 
 		 pattern_Array(blue),
@@ -155,8 +160,85 @@ def get_pattern(data):
 		 pattern_Array(black+white),
 		pattern_Array(black+green),
 		pattern_Array(black+blue),
-		pattern_Array(black+red)
+		pattern_Array(black+red),
+		pattern_Array(black+white+green),
+		pattern_Array(black+white+blue),
+		pattern_Array(black+white+red),
+		pattern_Array(black+green+blue),
+		pattern_Array(black+green+red),
+		pattern_Array(black+blue+red),
+		pattern_Array(white+green),
+		pattern_Array(white+blue),
+		pattern_Array(white+red),
+		pattern_Array(white+green+blue),
+		pattern_Array(white+green+red),
+		pattern_Array(white+blue+red),
+		pattern_Array(green+blue),
+		pattern_Array(green+red),
+		pattern_Array(green+blue+red),
+		pattern_Array(blue+red)
 	)
 
-			
+
+
+def get_needlePos_VNB():
+	connectionVNB.send("getNpos")
+	received_VNB = connectionVNB.receive()
+	return received_VNB[1][0]
+
+def get_needlePos_HNB():
+	connectionMotor.send("getNpos")
+	received_VNB = connectionVNB.receive()
+	return received_VNB[1][0]
+
+def drive_left():
+	connectionMotor.send("setDrive_left")
+	received_Motor = connectionMotor.receive()
+	return received_Motor[1][0]
+
+def drive_right():
+	connectionMotor.send("setDrive_right")
+	received_Motor = connectionMotor.receive()
+	return received_Motor[1][0]
+
+def drive_right():
+	connectionMotor.send("slowDownSpeed",1)
+	received_Motor_Speed=connectionMotor.receive()
+	return received_Motor_Speed[1][0]
+
+def rowEndStopp(endStopp):
+	connectionMotor.send("setRowEndStopp", endStopp)
+	received_Motor_endStopp=connectionMotor.receive()
+	row_end = received_Motor_endStopp[1][0]
+	print("rowEndStopp: ", row_end)
+	return
+
+def colourChange(col):
+	connectionMotor.send("setColourChange", col)
+	return
+
+def returnTechData(number):
+	data = []
+
+	nameTech = str(number)+".txt"
+
+	file_name = ("/home/pi/Passap/Tech/"+(nameTech))
+
+	with open(file_name) as f:
+		reader = csv.reader (f)
+		for r in reader:
+			data.append(r)
+		data.pop(0)
+	return data
+
+def techArray():
+	global countTech
+	if countTech >= len(tech_Array): # Þetta er eh spooky, skoða seinna
+		countTech = 0
+	
+	x = int(tech_Array[countTech][0])
+	rowCount_VNB += x
+
+
+
 

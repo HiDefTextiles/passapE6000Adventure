@@ -168,3 +168,74 @@ Kóðarnir hennar eru torlesnir og gætu verið mun betur skrifaðir. Allar brey
 Ég er búin að minnka fyrstu 800 línurnar niðu í minna en 200 með einfaldri notkun á numpy og skilning a fylkja notkun. Hægt er að sjá hreinskrifuðu útgáfuna undir möppunni Irene með nafninu controler-elli-cleanup.py
 
 ég held áfram með þetta á morgun eftir hreinsun á vél
+
+# 7/5/24
+
+Þrif og teambonding
+
+# 8/5/24
+
+Punktar um gpio merki.
+
+Til að fá gpio input í program er hægt að framkvæma "polling".
+Getur misst af inputi ef gidli er lesið á vitlausum tíma.
+Gert í lykkjum og er mögulega íþungt á keyrslu umhvefið.
+Öunnr aðferðir er að nota "interrupts" sem tekur eftir muninum á milli breytingum, frá hi to low (falling) frá low to hi (rising)
+
+
+Kláruðum að þrífa.
+
+Skoðaði betur munninn á tölvu og mekanísku útgáfunni frá Passap.
+
+Tölvu útgáfan er með 
+- 2 input, ljósskynjararnit tveir sem staðsetjan
+- 2 output, seglar sem raða nálum fyrir munstur næstu línu
+Sameiginlegt er
+- Mekaníkinn sem ýtir nálonum upp er sú sama.
+- nálabeðið er óbreytt
+
+# 10/5/24
+
+Öll ljós slökkt og ekki sál að sjá.
+
+Er komin með 250 línur af hreinskrifaðari kóða útgáfu frá Irene.
+
+Er að bryja á tech array hjá henni.
+
+![Mynd af tech array dæmi](/img/techfile.png)
+
+Hér útskýrist betur þessi blessaði tech array file hjá henni.
+
+fyrstu tvö gildin lýsir hún sem skipun um að byrja pattern á nýrri línu.
+
+```
+    x = tech_Array[countTech][0]
+    x = int(x)
+    rowCount_VNB = int(rowCount_VNB) + x
+```
+
+Þar sem rowcount_VNB er nr línu á fremri lásnum.
+countTech er lína í tech file, 0 er index á fyrstu tölunni
+
+Næst koma hvaða lita vigra hún nota.
+Þar er gefin strengur sem er enumaður á skipun sem sendir viðeigandi vigur á viðeigandi Arduino.
+
+V - fremri, H - Aftari
+
+Svo er stillingin sem að lásin á að vera í. Hún stilir það sjálf
+
+svo skipanir til að skipta um lit, sem ég skil ekki alveg.
+
+Hún seigir að þetta sé boolean já og nei fyrir skipti og stop en þegar hún skiptir um lit breytast þesssi gildi ekki neitt.
+
+svo bara info dump, þetta væri vel hægt að sleppa.
+
+Virkni segla lásins voru í raun sanreynd í prufunum í dag. 
+Hann stillit uppröðunninni fyrir næstu umferð. Default er 1 þarf að senda 0 til að setja í hvildarstöðu.
+Pusherarnir stýra svo einhvernveginn hvaða nálar eru notaðar.
+Það er bara hlustað á pusherana þegar x stilling er virk og þegar kveikr er á örvum í gömlutýpunni er uppröðun þeirra breytt.
+
+Þetta væri þá hægt að þýða yfir í kóða og sleppa motor stýringum.
+
+Prufurnar gengu þó eh og gott að sjá mekaníkinn í virkni.
+
