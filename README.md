@@ -239,3 +239,211 @@ Pusherarnir stýra svo einhvernveginn hvaða nálar eru notaðar.
 
 Prufurnar gengu þó eh og gott að sjá mekaníkinn í virkni.
 
+# 15/5/24
+
+## Prototype 1
+
+Staðan í dag, komin með arduino tengingu við lásinn. Get lesið ljósskynjara og breytt segulsviði seglana.
+
+Þá er bara að stúttera bamberg og irene stýringarnar.
+
+
+Næ að láta intterupt virka fyrir PIN_CSENSE en ekki PIN_CREF, en hann skynjar breytt gildi á báðum þannig við látum eina innterrupt rútínu virka
+
+Fyrir Vinstri til hægri koma gildin
+
+40 & 31
+
+Fyrir hægri til vinstri fáum við gildin
+
+41 & 30
+
+Úr innterrupt rútinum hennar Irene
+
+
+# 16/5/24
+
+## Prototype 2
+Ný rás fræsuð, viðnám lóðuð, tengi og pinnar.
+
+Skynjarar í lagi, skipti út powersupply fyrir annað sem ég fann liggjandi í vr 3 og seglarnir virka.
+
+Þá er bara eftir að útfæra kóða sem samnýtir hreyfingu
+
+# 17/5/24
+
+CREF er ekki tengt í pinna sem styður interrupt.
+
+Vélin stíflaðist, tók hana í sundur, sem er fínt. Hafði langað að gera það til að sjá pusherana betur.
+
+# 21/5/24
+
+Horfði upp undir pusherana til að sjá hvar þeir byrja að raðast eftir stillingu. Breytti svo stillingunni og sá hversu margir pusherar voru á milli þess að breytinginn skilaði sér. Merkti þann punkt á velina og notaði hann sem calibration punkt.
+
+Þetta er punkturinn þar sem röðun pusherana er ákveðin. Hvort þeir fara upp eða niður. Miðaði svo við þann punkt og prófaði að færa hann eitt nálarbeð í einu og breyta stillingu til að sannreyna og það gekk. 
+
+Notaði svo ljósaskynjarann og las hvaða munstur kom úr interruptinu í hvert skipti sem ég færði calibration/samstillingar punktinn á milli nálarbeða. 
+
+Tölugildin eru því 41 og 31 eða 11 og 01;
+11: Cref=1 & Csense=1;
+01: Cref=0 & Csense=1;
+
+Til að staðsetja lásin á nálarbeðinu tökum við hann alveg út í enda. Rennum honum svo hægt inná leiðarvísirinn og greinum gildi.
+
+Út frá því fáum við alla punkta. Það ætti að vera nóg að gera þetta bara í eina átt. Frá vinstri til hægri, horft beint á fremri lásin. Því Hægri til vinstri ætti í raun bara að telja niður sömu gildi, allavega fyrir nálarbeðin, jaðar punktarnir gætu verið annað mál. SKoðum það þegar þar að kemur
+
+Punktar fyrir kvörðun á nálabeða ás útfrá ljósskynjara
+
+Upphafsgildi breyturnar state & counter eru 0;
+```
+// direction
+volatile int state = 0;
+// position
+volatile int counter = 0;
+```
+
+State seigir okkur um stöðu beggja ljósskynjarana og útfrá því getum við ákvarðað átt. Counter telur hverja nál og er ætlað til að staðsetja okkur.
+
+Með state ákvöðrum við hvort við hækkum eða lækkum counter, út frá counter fáum við staðetningu
+
+# 22/5/24
+
+Villur lagaðar og ás nálabeðs kvarðaður.
+
+
+Til að kvarða nálabeðið þarf að taka lásinn/sleðann af. Endurkveikja á arduino og renna honum á.
+
+
+// 30 0
+// 31 0
+
+// 31 0
+// 40 -1
+// 41 0
+// 40 -1
+// 41 0
+// 40 -1
+
+// byrjar 31 0
+// svo mynztur 40 - 41
+// byrjar loks 41 - 30
+// í 28 erum við komin á fyrstu nálina
+// 207 seinasta nál || 206
+// 243 auto color endir
+// 221 útaf hægri
+
+# 23/5/24
+
+Munztrið sem kemur þegar honum er rennt á er, 40 telur niður og 41 upp
+
+31 - 0
+40 - -1
+41 - 0
+40 - -1
+41 - 0
+40 - -1
+41 - 0 // 41-30 nála munustur++
+30 - 0
+41 - 1
+
+28 er nál 1 og 206 nál 179
+
+## Kenning 
+
+Nálabeðið er samhverft og merkt með heiltölum í báðar áttir frá miðju með 
+
+90 nálar vinstra megin
+
+89 nálar hægra megin
+
+Tölvur byrja í núlli, þannig ef fyrsta nálinn vinstra megin við miðju er 0
+þá er nálabeðið samhverft um hana í hugbúnaðinum það er
+
+-89 0 89.
+
+## Framkvæmd
+
+Við viljum að notandinn geti skilgreint fyrstu nál til vinstri. Best væri að notandinn gæti notast við innbygpu tölurnar á vélinni.
+
+Notandi segir að munztur byrji á nál 90 til vinstri, þá þarf það að vera 0 í munztur vigri.
+
+setur inn -90,
+sem er nál 28
+### Hugmynd
+```
+int input = -90;
+int start = (input < 0) ? input +90 : input + 89;
+int line = 0;
+counter - 28 - (start) = 0;
+206 - 28 = 179
+if (counter >= (28+start) && counter < 207)
+{
+	int index = counter - 28 - start;
+	digitalWrite(pin,PatternMatrix[index])
+	if (counter > width of matrix + start || (line>0 && counter < 28+start))
+	{
+		line++
+	}
+}
+
+counter - 28 + input = 0
+```
+
+### útfærsla
+Notobene þetta eru 178 nálar og við byrjum í 0,
+þannig index er á bilinu 0-177, fyrir allar nálar á borðinu
+
+#### Einn vídd Index
+```
+    int input = -90;
+    int start = (input < 0) ? input + 90 : input + 89;
+    int index = counter - 28 - start;
+```
+If var óþarfi þar sem við setjum bara núll punkt og okkur ætti að vera sama um öll önnur gildi. Þannig þótt index flæði út fyrir þá er hann ekki að stýra neinu.
+
+
+Þegar ég var að prufukeyra index, var ljost að þar sem seglarnir eru ekki á samastað þá þarf að vera með sér tölu fyrir hvorn, það virðist vera 10 nála bil á milli, þannig við bara bætum við 10 á bakaleiðinni við index. einnig virtist vera 2 nála offset frá fyrstu nál og stillingar punkti, sem er innan skekkju marka mannsins.
+
+vona ég.
+
+ég breytti því núll punkti nálarásins í 26 til að lagfæra það.
+
+```
+		int input = -10;
+		int start = (input < 0) ? input + 90 : input + 89;
+		int index = counter - 26 - start;
+		int value = 1;
+```
+##### Hægri til vinstri
+```
+			if (index + 10 >= 0 && index + 10 < arraysize)
+			{
+				value = array[index + 10];
+			}
+			digitalWrite(PIN_NEEDLE_RTL, value);
+```
+##### Vinstri til hægri
+```
+			if (index >= 0 && index < arraysize)
+			{
+				value = array[index];
+			}
+			digitalWrite(PIN_NEEDLE_LTR, value);
+
+```
+#### Tveggja vídda Index
+Þá er það línu meðhöndlun.
+
+Byrjum alltaf að prjóna hægri til vinstri.
+Setjum alltaf lásinn/sleðann á frá vinstri til hægri.
+
+Þurfum þá að stilla nálarnar þannig fyrst.
+
+Þannig sleðin byrjar alltaf lengst til vinstri?
+vonandi
+ 
+
+
+
+
+
