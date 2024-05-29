@@ -441,7 +441,30 @@ Setjum alltaf lásinn/sleðann á frá vinstri til hægri.
 
 Þannig sleðin byrjar alltaf lengst til vinstri?
 vonandi
- 
+
+
+# 27/5/24
+
+Fann kennslumyndbönd á netinu um það hvernig maður sendir skipanir frá python yfir á arduino.
+
+
+## Næstu ítranir // TODO
+- Útfæra grunn að samskiptum á milli arduino og umheimsins
+	- Bæta við raspberry pi
+	- bakenda
+	- python/javascript?
+- Bæta við motor // skoða
+	- mögulega motor stýringu
+	- Hægt að vita staðsetningu autocolor
+
+# 28/5/24
+
+Takmarkanir á gögnum send til arduino.
+
+Ef við notum streng þá getur hann verip með 768 stafi.
+
+Ef við sendjum 
+
 
 
 

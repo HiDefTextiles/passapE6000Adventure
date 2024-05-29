@@ -11,6 +11,7 @@
 
 // Skynjarar
 volatile int csenseNow = 0;
+
 volatile int crefNow = 0;
 
 // sensor change
@@ -18,15 +19,19 @@ volatile boolean interrupted = false;
 // direction
 volatile int state = 0;
 // position
+int input = -10;
 volatile int counter = 0;
 unsigned long lastCursorChange = 0;
-volatile int step = 0;
-volatile int sub_step = 0;
+// volatile int step = 0;
+// volatile int sub_step = 0;
 // - Setup
 // array
+// int lengd = 179;
 // int array[255] = {0, 1, 0, 1, 0,1, 0, 1, 0, 1,0, 1, 0, 1, 0,1, 0, 1, 0, 1,0, 1, 0, 1, 0,1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0};
-int array[10] = {0};
-int arraysize = sizeof(array) / sizeof(array[0]); void setup()
+int array[179] = {0};
+int arraysize = 179;
+
+void setup()
 {
   Serial.begin(115200);
 
@@ -47,12 +52,21 @@ int arraysize = sizeof(array) / sizeof(array[0]); void setup()
 
 void loop()
 {
-  if (interrupted)
+  serialStream();
+}
+
+// Interrupt
+void interrupt_CSENSE()
+{
+
+  int csenseNew = digitalRead(PIN_CSENSE);
+  if (csenseNow != csenseNew)
   {
-    // Serial.println(state);
-    // Serial.println(counter);
-    interrupted = false;
-    int input = -10;
+    crefNow = digitalRead(PIN_CREF);
+
+    // interrupted = true; // flag
+    csenseNow = csenseNew;
+    state = ((crefNow + 3) * 10) + csenseNow;
     int start = (input < 0) ? input + 90 : input + 89;
     int index = counter - 26 - start;
     int value = 1;
@@ -61,10 +75,10 @@ void loop()
     case 31:
     {
       // counter--;
-          if (index+10 >= 0 && index+10 < arraysize)
-    {
-      value = array[index+10];
-    }
+      if (index + 10 >= 0 && index + 10 < arraysize)
+      {
+        value = array[index + 10];
+      }
       digitalWrite(PIN_NEEDLE_RTL, value);
     }
     break;
@@ -77,35 +91,45 @@ void loop()
     {
       // digitalWrite(PIN_NEEDLE_LTR, 0);
       counter++;
-                if (index >= 0 && index < arraysize)
-    {
-      value = array[index];
-    }
+      if (index >= 0 && index < arraysize)
+      {
+        value = array[index];
+      }
       digitalWrite(PIN_NEEDLE_LTR, value);
     }
     default:
       break;
     }
-    Serial.println(index);
-  }
-}
-
-// Interrupt
-void interrupt_CSENSE()
-{
-
-  int csenseNew = digitalRead(PIN_CSENSE);
-  if (csenseNow != csenseNew)
-  {
-    crefNow = digitalRead(PIN_CREF);
-
-    interrupted = true; // flag
-    csenseNow = csenseNew;
-    state = ((crefNow + 3) * 10) + csenseNow;
   }
   // Serial.println(9999999); // til að sjá endurtekningu
 }
 
+void serialStream()
+{
+  if (Serial.available() == 0)
+  {
+    return;
+  }
+  while (Serial.available() != 0)
+  {
+    String inputString = Serial.readStringUntil('!');
+    int lengd = inputString.length();
+    Serial.println(inputString);
+    if (lengd > 2)
+    {
+      arraysize = lengd - 3;
+      int tala = (inputString.charAt(1) - '0') * 10 + (inputString.charAt(2) - '0');
+      Serial.println(tala);
+      input = (inputString.charAt(0) == '+') ? tala : -tala;
+      Serial.println(input);
+      for (int i = 3; i < lengd; i++)
+      {
+        array[i - 3] = inputString.charAt(i) - '0';
+      }
+    }
+  }
+  return;
+}
 // 30 0
 // 31 0
 
