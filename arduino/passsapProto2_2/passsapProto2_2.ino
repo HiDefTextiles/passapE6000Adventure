@@ -64,7 +64,6 @@ void interrupt_CSENSE()
   {
     crefNow = digitalRead(PIN_CREF);
 
-    // interrupted = true; // flag
     csenseNow = csenseNew;
     state = ((crefNow + 3) * 10) + csenseNow;
     int start = (input < 0) ? input + 90 : input + 89;
@@ -74,10 +73,11 @@ void interrupt_CSENSE()
     {
     case 31:
     {
-      // counter--;
       if (index + 10 >= 0 && index + 10 < arraysize)
       {
         value = array[index + 10];
+      } else if (index  == -11) {
+        Serial.println('L');
       }
       digitalWrite(PIN_NEEDLE_RTL, value);
     }
@@ -89,11 +89,12 @@ void interrupt_CSENSE()
     break;
     case 41:
     {
-      // digitalWrite(PIN_NEEDLE_LTR, 0);
       counter++;
       if (index >= 0 && index < arraysize)
       {
         value = array[index];
+      } else if (index == arraysize) {
+        Serial.println('R');
       }
       digitalWrite(PIN_NEEDLE_LTR, value);
     }
@@ -101,7 +102,6 @@ void interrupt_CSENSE()
       break;
     }
   }
-  // Serial.println(9999999); // til að sjá endurtekningu
 }
 
 void serialStream()
@@ -114,14 +114,12 @@ void serialStream()
   {
     String inputString = Serial.readStringUntil('!');
     int lengd = inputString.length();
-    Serial.println(inputString);
+    
     if (lengd > 2)
     {
       arraysize = lengd - 3;
       int tala = (inputString.charAt(1) - '0') * 10 + (inputString.charAt(2) - '0');
-      Serial.println(tala);
       input = (inputString.charAt(0) == '+') ? tala : -tala;
-      Serial.println(input);
       for (int i = 3; i < lengd; i++)
       {
         array[i - 3] = inputString.charAt(i) - '0';
