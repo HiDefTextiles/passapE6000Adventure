@@ -26,7 +26,8 @@ volatile int sub_step = 0;
 // array
 // int array[255] = {0, 1, 0, 1, 0,1, 0, 1, 0, 1,0, 1, 0, 1, 0,1, 0, 1, 0, 1,0, 1, 0, 1, 0,1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0};
 int array[10] = {0};
-int arraysize = sizeof(array) / sizeof(array[0]); void setup()
+int arraysize = sizeof(array) / sizeof(array[0]);
+void setup()
 {
   Serial.begin(115200);
 
@@ -61,10 +62,10 @@ void loop()
     case 31:
     {
       // counter--;
-          if (index+10 >= 0 && index+10 < arraysize)
-    {
-      value = array[index+10];
-    }
+      if (index + 10 >= 0 && index + 10 < arraysize)
+      {
+        value = array[index + 10];
+      }
       digitalWrite(PIN_NEEDLE_RTL, value);
     }
     break;
@@ -77,10 +78,10 @@ void loop()
     {
       // digitalWrite(PIN_NEEDLE_LTR, 0);
       counter++;
-                if (index >= 0 && index < arraysize)
-    {
-      value = array[index];
-    }
+      if (index >= 0 && index < arraysize)
+      {
+        value = array[index];
+      }
       digitalWrite(PIN_NEEDLE_LTR, value);
     }
     default:
@@ -119,7 +120,7 @@ void interrupt_CSENSE()
 // byrjar 31 0
 // svo mynztur 40 - 41
 // byrjar loks 41 - 30
-// í 28 erum við komin á fyrstu nálina
-// 207 seinasta nál || 206
-// 243 auto color endir
-// 221 útaf hægri
+// í 28 erum við komin á fyrstu nálina 26
+// 207 seinasta nál || 206 205
+// 243 auto color endir     241
+// 221 útaf hægri 221
